@@ -117,45 +117,25 @@ function clear() {
     c.clearRect(0, 0, window.innerWidth, window.innerHeight)
 }
 function drawColouredSprite(pos, dim, colour) {
-    const img = new Image()
-    const outlineImg = new Image()
-
+    let img = new Image()
     img.src = 'Sprites/slime.png'
-    outlineImg.src = 'Sprites/slimeOutline.png'
-
     img.onload = () => {
-        // Save existing canvas state
-        const imageData = c.getImageData(pos.x, pos.y, dim.x, dim.y)
-
-        // Draw the base sprite at position
+        // Draw the base sprite
         c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
 
-        // Tint only the drawn sprite
-        c.globalCompositeOperation = 'source-in'
-        c.fillStyle = `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
-        c.fillRect(pos.x, pos.y, dim.x, dim.y)
-
-        // Restore normal composite mode
+        // Tint it using source-atop to color only opaque pixels
+        c.globalCompositeOperation = 'source-atop'
+        drawRect(pos, dim, colour)
         c.globalCompositeOperation = 'source-over'
 
-        // Draw the outline sprite over the tinted one
-        outlineImg.onload = () => {
-            c.drawImage(outlineImg, pos.x, pos.y, dim.x, dim.y)
+        // Now load and draw the outline
+        let outline = new Image()
+        outline.src = 'Sprites/slimeOutline.png'
+        outline.onload = () => {
+            c.drawImage(outline, pos.x, pos.y, dim.x, dim.y)
         }
-
-        // Restore background that might have been affected
-        c.putImageData(imageData, pos.x, pos.y)
-        c.drawImage(img, pos.x, pos.y, dim.x, dim.y) // redraw with tint applied
-        c.globalCompositeOperation = 'source-in'
-        c.fillStyle = `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
-        c.fillRect(pos.x, pos.y, dim.x, dim.y)
-        c.globalCompositeOperation = 'source-over'
-
-        // Final outline
-        c.drawImage(outlineImg, pos.x, pos.y, dim.x, dim.y)
     }
 }
-
 class Slime {
     constructor(pos = Vector2.zero, vel = Vector2.zero, size = 0, age = 0, gene = new Gene(0, 0, 0, Colour.white)) {
         this.pos = pos
