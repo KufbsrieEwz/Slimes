@@ -119,22 +119,13 @@ function clear() {
 function drawColouredSprite(pos, dim, colour) {
     let img = new Image()
     img.src = 'Sprites/slime.png'
-    img.onload = () => {
-        // Draw the base sprite
-        c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
-
-        // Tint it using source-atop to color only opaque pixels
-        c.globalCompositeOperation = 'source-atop'
-        drawRect(pos, dim, colour)
-        c.globalCompositeOperation = 'source-over'
-
-        // Now load and draw the outline
-        let outline = new Image()
-        outline.src = 'Sprites/slimeOutline.png'
-        outline.onload = () => {
-            c.drawImage(outline, pos.x, pos.y, dim.x, dim.y)
-        }
-    }
+    c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
+    c.globalCompositeOperation = 'source-atop'
+    drawRect(pos, dim, colour)
+    c.globalCompositeOperation = 'source-over'
+    img = new Image()
+    img.src = 'Sprites/slimeOutline.png'
+    c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
 }
 class Slime {
     constructor(pos = Vector2.zero, vel = Vector2.zero, size = 0, age = 0, gene = new Gene(0, 0, 0, Colour.white)) {
