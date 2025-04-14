@@ -116,17 +116,33 @@ function write(text, pos, colour) {
 function clear() {
     c.clearRect(0, 0, window.innerWidth, window.innerHeight)
 }
-function drawColouredSprite(pos, dim, colour) {
-    let img = new Image()
-    img.src = 'Sprites/slime.png'
-    c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
-    c.globalCompositeOperation = 'source-atop'
-    drawRect(pos, dim, colour)
-    c.globalCompositeOperation = 'source-over'
-    img = new Image()
-    img.src = 'Sprites/slimeOutline.png'
-    c.drawImage(img, pos.x, pos.y, dim.x, dim.y)
+function drawColouredSprite(pos, dim, colour, baseImg, outlineImg) {
+    // 1. Create an offscreen canvas
+    let offCanvas = document.createElement('canvas')
+    offCanvas.width = dim.x
+    offCanvas.height = dim.y
+    let offCtx = offCanvas.getContext('2d')
+
+    // 2. Draw the base sprite onto the offscreen canvas
+    offCtx.drawImage(baseImg, 0, 0, dim.x, dim.y)
+
+    // 3. Set blend mode to tint non-transparent pixels
+    offCtx.globalCompositeOperation = 'source-in'
+    offCtx.fillStyle = `rgba(${colour.r}, ${colour.g}, ${colour.b}, ${colour.a})`
+    offCtx.fillRect(0, 0, dim.x, dim.y)
+
+    // 4. Reset blend mode
+    offCtx.globalCompositeOperation = 'source-over'
+
+    // 5. Draw tinted result to main canvas
+    c.drawImage(offCanvas, pos.x, pos.y)
+
+    // 6. Draw outline on top (if provided)
+    if (outlineImg) {
+        c.drawImage(outlineImg, pos.x, pos.y, dim.x, dim.y)
+    }
 }
+
 class Slime {
     constructor(pos = Vector2.zero, vel = Vector2.zero, size = 0, age = 0, gene = new Gene(0, 0, 0, Colour.white)) {
         this.pos = pos
@@ -144,7 +160,10 @@ class Slime {
         }
     }
     draw() {
-        drawColouredSprite(this.pos.add(Vector2.unit.multiply(-this.size/2)), Vector2.unit.multiply(this.size), this.gene.colour)
+        let baseImg, outlineImg = new Image()
+        baseImg.src = 'Sprites/slime.png'
+        outlineImg.src = 'Sprites/slimeOutline.png'
+        drawColouredSprite(this.pos.add(Vector2.unit.multiply(-this.size/2)), Vector2.unit.multiply(this.size), this.gene.colour, baseImg, outlineImg)
     }
     update() {
         this.vel.y += 0.01
