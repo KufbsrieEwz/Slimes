@@ -160,7 +160,8 @@ class Slime {
         }
     }
     draw() {
-        let baseImg, outlineImg = new Image()
+        let baseImg = new Image()
+        let outlineImg = new Image()
         baseImg.src = 'Sprites/slime.png'
         outlineImg.src = 'Sprites/slimeOutline.png'
         drawColouredSprite(this.pos.add(Vector2.unit.multiply(-this.size/2)), Vector2.unit.multiply(this.size), this.gene.colour, baseImg, outlineImg)
