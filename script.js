@@ -122,6 +122,7 @@ function drawColouredSprite(pos, dim, colour, baseImg, outlineImg) {
     offCanvas.width = dim.x
     offCanvas.height = dim.y
     let offCtx = offCanvas.getContext('2d')
+    offCtx.imageSmoothingEnabled = false
 
     // 2. Draw the base sprite onto the offscreen canvas
     offCtx.drawImage(baseImg, 0, 0, dim.x, dim.y)
